@@ -17,12 +17,16 @@
         "title": "Keyboard Light",
         "width": 800,
         "height": 100,
+        "x": 560,
+        "y": 980,
         "decorations": false,
         "transparent": true,
         "alwaysOnTop": true,
         "skipTaskbar": true,
         "visible": true,
-        "resizable": false
+        "resizable": false,
+        "acceptFirstMouse": true,
+        "shadow": false
       }
     ],
     "security": {

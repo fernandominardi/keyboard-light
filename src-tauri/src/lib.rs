@@ -22,8 +22,13 @@ pub fn run() {
             }
 
             // Register the shortcut
-            use tauri_plugin_global_shortcut::GlobalShortcutExt;
-            app.handle().global_shortcut().on_shortcut("Ctrl+Space", |app, _shortcut, _event| {
+            use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
+            app.handle().global_shortcut().on_shortcut("Ctrl+Space", |app, _shortcut, event| {
+                // Only respond to key press, ignore key release
+                if event.state != ShortcutState::Pressed {
+                    return;
+                }
+
                 if let Some(window) = app.get_webview_window("main") {
                     if window.is_visible().unwrap_or(false) {
                         let _ = window.hide();

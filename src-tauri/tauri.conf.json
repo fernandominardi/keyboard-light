@@ -13,9 +13,16 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "keyboard-light",
+        "label": "main",
+        "title": "Keyboard Light",
         "width": 800,
-        "height": 600
+        "height": 100,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": true,
+        "resizable": false
       }
     ],
     "security": {

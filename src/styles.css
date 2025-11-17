@@ -1,7 +1,13 @@
-body {
-  /* This makes the actual content of our window a solid white block */
-  background-color: white;
+/* Full-height to let the gradient fill the window */
+html, body {
+  height: 100%;
+}
 
-  /* This removes any default spacing around the edges */
+body {
   margin: 0;
+  /* Solid white at bottom -> fully transparent at top */
+  background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+  /* Prevent any default background bleed */
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }

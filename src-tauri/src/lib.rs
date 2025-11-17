@@ -7,7 +7,7 @@ pub fn run() {
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
 
-            // Make window click-through
+            // Configure window to be click-through (allows mouse events to pass through to underlying windows)
             #[cfg(target_os = "windows")]
             {
                 use windows::Win32::Foundation::HWND;
@@ -18,7 +18,12 @@ pub fn run() {
 
                 let hwnd = HWND(window.hwnd().unwrap().0);
                 unsafe {
+                    // Get current extended window styles
                     let ex_style = GetWindowLongW(hwnd, GWL_EXSTYLE);
+                    // Add layered, transparent, and no-activate styles
+                    // - WS_EX_LAYERED: Required for transparency effects
+                    // - WS_EX_TRANSPARENT: Makes window click-through
+                    // - WS_EX_NOACTIVATE: Prevents window from stealing focus
                     SetWindowLongW(
                         hwnd,
                         GWL_EXSTYLE,
@@ -27,7 +32,7 @@ pub fn run() {
                 }
             }
 
-            // Register global shortcut using the recommended Builder pattern
+            // Register Ctrl+Space global shortcut to toggle window visibility
             #[cfg(desktop)]
             {
                 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
@@ -36,15 +41,17 @@ pub fn run() {
                     tauri_plugin_global_shortcut::Builder::new()
                         .with_shortcuts(["ctrl+space"])?
                         .with_handler(|app, shortcut, event| {
+                            // Only respond to key press events (not release)
                             if event.state == ShortcutState::Pressed {
                                 if shortcut.matches(Modifiers::CONTROL, Code::Space) {
                                     if let Some(window) = app.get_webview_window("main") {
+                                        // Toggle window visibility
                                         if window.is_visible().unwrap_or(false) {
                                             let _ = window.hide();
                                         } else {
                                             let _ = window.show();
 
-                                            // Prevent focus stealing on Windows
+                                            // Keep window on top without stealing focus
                                             #[cfg(target_os = "windows")]
                                             {
                                                 use windows::Win32::Foundation::HWND;
@@ -55,6 +62,10 @@ pub fn run() {
 
                                                 if let Ok(hwnd) = window.hwnd() {
                                                     unsafe {
+                                                        // Position window as topmost without changing size/position or activating it
+                                                        // - HWND_TOPMOST: Places window above all non-topmost windows
+                                                        // - SWP_NOMOVE | SWP_NOSIZE: Preserve current position and size
+                                                        // - SWP_NOACTIVATE: Don't activate or focus the window
                                                         let _ = SetWindowPos(
                                                             HWND(hwnd.0),
                                                             HWND_TOPMOST,

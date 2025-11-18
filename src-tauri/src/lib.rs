@@ -1,5 +1,42 @@
 use tauri::tray::{TrayIconBuilder, MouseButton, MouseButtonState};
-use tauri::Manager;
+use tauri::{Manager, WebviewWindow};
+
+/// Toggles the visibility of the main window.
+/// When showing the window, it re-applies click-through settings and positions it as topmost without stealing focus.
+fn toggle_window_visibility(window: &WebviewWindow) {
+    if window.is_visible().unwrap_or(false) {
+        let _ = window.hide();
+    } else {
+        let _ = window.show();
+        // Re-apply click-through setting after showing the window.
+        let _ = window.set_ignore_cursor_events(true);
+
+        // Keep window on top without stealing focus
+        #[cfg(target_os = "windows")]
+        {
+            use windows::Win32::Foundation::HWND;
+            use windows::Win32::UI::WindowsAndMessaging::{
+                SetWindowPos, HWND_TOPMOST,
+                SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE
+            };
+
+            if let Ok(hwnd) = window.hwnd() {
+                unsafe {
+                    // Position window as topmost without changing size/position or activating it
+                    // - HWND_TOPMOST: Places window above all non-topmost windows
+                    // - SWP_NOMOVE | SWP_NOSIZE: Preserve current position and size
+                    // - SWP_NOACTIVATE: Don't activate or focus the window
+                    let _ = SetWindowPos(
+                        HWND(hwnd.0),
+                        HWND_TOPMOST,
+                        0, 0, 0, 0,
+                        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE
+                    );
+                }
+            }
+        }
+    }
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -45,32 +82,7 @@ pub fn run() {
                             match button {
                                 MouseButton::Left => {
                                     if let Some(window) = app.get_webview_window("main") {
-                                        if window.is_visible().unwrap_or(false) {
-                                            let _ = window.hide();
-                                        } else {
-                                            let _ = window.show();
-                                            let _ = window.set_ignore_cursor_events(true);
-
-                                            #[cfg(target_os = "windows")]
-                                            {
-                                                use windows::Win32::Foundation::HWND;
-                                                use windows::Win32::UI::WindowsAndMessaging::{
-                                                    SetWindowPos, HWND_TOPMOST,
-                                                    SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE
-                                                };
-
-                                                if let Ok(hwnd) = window.hwnd() {
-                                                    unsafe {
-                                                        let _ = SetWindowPos(
-                                                            HWND(hwnd.0),
-                                                            HWND_TOPMOST,
-                                                            0, 0, 0, 0,
-                                                            SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE
-                                                        );
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        toggle_window_visibility(&window);
                                     }
                                 }
                                 MouseButton::Middle => {
@@ -95,39 +107,7 @@ pub fn run() {
                             if event.state == ShortcutState::Pressed {
                                 if shortcut.matches(Modifiers::CONTROL | Modifiers::ALT, Code::Space) {
                                     if let Some(window) = app.get_webview_window("main") {
-                                        // Toggle window visibility
-                                        if window.is_visible().unwrap_or(false) {
-                                            let _ = window.hide();
-                                        } else {
-                                            let _ = window.show();
-                                            // Re-apply click-through setting after showing the window.
-                                            let _ = window.set_ignore_cursor_events(true);
-
-                                            // Keep window on top without stealing focus
-                                            #[cfg(target_os = "windows")]
-                                            {
-                                                use windows::Win32::Foundation::HWND;
-                                                use windows::Win32::UI::WindowsAndMessaging::{
-                                                    SetWindowPos, HWND_TOPMOST,
-                                                    SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE
-                                                };
-
-                                                if let Ok(hwnd) = window.hwnd() {
-                                                    unsafe {
-                                                        // Position window as topmost without changing size/position or activating it
-                                                        // - HWND_TOPMOST: Places window above all non-topmost windows
-                                                        // - SWP_NOMOVE | SWP_NOSIZE: Preserve current position and size
-                                                        // - SWP_NOACTIVATE: Don't activate or focus the window
-                                                        let _ = SetWindowPos(
-                                                            HWND(hwnd.0),
-                                                            HWND_TOPMOST,
-                                                            0, 0, 0, 0,
-                                                            SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE
-                                                        );
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        toggle_window_visibility(&window);
                                     }
                                 }
                             }

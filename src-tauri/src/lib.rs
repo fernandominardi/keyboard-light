@@ -74,6 +74,7 @@ pub fn run() {
             }
 
             let _tray = TrayIconBuilder::new()
+                .icon(app.default_window_icon().unwrap().clone())
                 .on_tray_icon_event(|tray, event| {
                     if let tauri::tray::TrayIconEvent::Click { button, button_state, .. } = event {
                         if button_state == MouseButtonState::Up {

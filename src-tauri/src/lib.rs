@@ -1,3 +1,4 @@
+use tauri::tray::{TrayIconBuilder, MouseButton, MouseButtonState};
 use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -35,7 +36,53 @@ pub fn run() {
                 }
             }
 
-            // Register Ctrl+Alt+Space global shortcut to toggle window visibility
+            let _tray = TrayIconBuilder::new()
+                .on_tray_icon_event(|tray, event| {
+                    if let tauri::tray::TrayIconEvent::Click { button, button_state, .. } = event {
+                        if button_state == MouseButtonState::Up {
+                            let app = tray.app_handle();
+
+                            match button {
+                                MouseButton::Left => {
+                                    if let Some(window) = app.get_webview_window("main") {
+                                        if window.is_visible().unwrap_or(false) {
+                                            let _ = window.hide();
+                                        } else {
+                                            let _ = window.show();
+                                            let _ = window.set_ignore_cursor_events(true);
+
+                                            #[cfg(target_os = "windows")]
+                                            {
+                                                use windows::Win32::Foundation::HWND;
+                                                use windows::Win32::UI::WindowsAndMessaging::{
+                                                    SetWindowPos, HWND_TOPMOST,
+                                                    SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE
+                                                };
+
+                                                if let Ok(hwnd) = window.hwnd() {
+                                                    unsafe {
+                                                        let _ = SetWindowPos(
+                                                            HWND(hwnd.0),
+                                                            HWND_TOPMOST,
+                                                            0, 0, 0, 0,
+                                                            SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE
+                                                        );
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                MouseButton::Middle => {
+                                    app.exit(0);
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+                })
+                .build(app)?;
+
             #[cfg(desktop)]
             {
                 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};

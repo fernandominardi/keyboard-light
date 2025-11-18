@@ -7,6 +7,9 @@ pub fn run() {
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
 
+            // Use Tauri's API to make the window ignore mouse events.
+            window.set_ignore_cursor_events(true).unwrap();
+
             // Configure window to be click-through (allows mouse events to pass through to underlying windows)
             #[cfg(target_os = "windows")]
             {
@@ -50,6 +53,8 @@ pub fn run() {
                                             let _ = window.hide();
                                         } else {
                                             let _ = window.show();
+                                            // Re-apply click-through setting after showing the window.
+                                            let _ = window.set_ignore_cursor_events(true);
 
                                             // Keep window on top without stealing focus
                                             #[cfg(target_os = "windows")]

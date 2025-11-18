@@ -32,18 +32,18 @@ pub fn run() {
                 }
             }
 
-            // Register Ctrl+Space global shortcut to toggle window visibility
+            // Register Ctrl+Alt+Space global shortcut to toggle window visibility
             #[cfg(desktop)]
             {
                 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
 
                 app.handle().plugin(
                     tauri_plugin_global_shortcut::Builder::new()
-                        .with_shortcuts(["ctrl+space"])?
+                        .with_shortcuts(["ctrl+alt+space"])?
                         .with_handler(|app, shortcut, event| {
                             // Only respond to key press events (not release)
                             if event.state == ShortcutState::Pressed {
-                                if shortcut.matches(Modifiers::CONTROL, Code::Space) {
+                                if shortcut.matches(Modifiers::CONTROL | Modifiers::ALT, Code::Space) {
                                     if let Some(window) = app.get_webview_window("main") {
                                         // Toggle window visibility
                                         if window.is_visible().unwrap_or(false) {

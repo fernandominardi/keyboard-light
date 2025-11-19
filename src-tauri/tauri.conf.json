@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "keyboard-light",
+  "productName": "Keyboard Light",
   "version": "0.1.0",
   "identifier": "com.fernandominardi.keyboardlight",
   "build": {

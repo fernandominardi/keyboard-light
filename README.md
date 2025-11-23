@@ -2,6 +2,7 @@
 
 A lightweight Windows desktop utility that displays a subtle white gradient overlay at the bottom of the screen,
 providing illumination for keyboards without backlight functionality. Built with Rust and Tauri for minimal resource usage.
+Just a simple application for personal use.
 
 ## Features
 
@@ -13,12 +14,12 @@ providing illumination for keyboards without backlight functionality. Built with
 - Global Shortcut: Press `Ctrl+Alt+Space` to toggle the overlay from anywhere
 - Minimal Footprint: Runs silently in the background with no taskbar presence
 
-### Prerequisites
+## Prerequisites
 
 - [Node.js](https://nodejs.org/)
 - [Rust](https://www.rust-lang.org/)
 
-### Build Steps
+## Build Steps
 
 ```bash
 # Install dependencies
@@ -26,3 +27,10 @@ npm install
 
 # Build the application
 npm run tauri build
+```
+
+The compiled executable will be in  `src-tauri/target/release/keyboard-light.exe`
+
+## License
+
+This project is licensed under the MIT License.

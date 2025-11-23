@@ -1,7 +1,28 @@
-# Tauri + Vanilla TS
+# Keyboard Light
 
-This template should help get you started developing with Tauri in vanilla HTML, CSS and Typescript.
+A lightweight Windows desktop utility that displays a subtle white gradient overlay at the bottom of the screen,
+providing illumination for keyboards without backlight functionality. Built with Rust and Tauri for minimal resource usage.
 
-## Recommended IDE Setup
+## Features
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+- Transparent Overlay: Displays a semi-transparent white gradient at the bottom of your screen
+- Click-Through: The overlay doesn't interfere with your work - clicks pass through to applications underneath
+- System Tray Control:
+  - Left-click the tray icon to toggle the overlay visibility
+  - Middle-click the tray icon to exit the application
+- Global Shortcut: Press `Ctrl+Alt+Space` to toggle the overlay from anywhere
+- Minimal Footprint: Runs silently in the background with no taskbar presence
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/)
+- [Rust](https://www.rust-lang.org/)
+
+### Build Steps
+
+```bash
+# Install dependencies
+npm install
+
+# Build the application
+npm run tauri build
